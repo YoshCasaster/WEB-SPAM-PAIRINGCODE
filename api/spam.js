@@ -35,9 +35,7 @@ export default async function handler(req, res) {
                 return res.status(400).json({ message: 'Nomor HP tidak valid.' });
             }
 
-            // Dummy spam logic
             progressCache.set('status', `Mengirim ke ${phoneNumber}`);
-            // Use Baileys API for spam logic here
             res.status(200).json({ message: `Mengirim ke ${phoneNumber}` });
         } else if (req.url === '/api/spam/stop') {
             progressCache.del('status');

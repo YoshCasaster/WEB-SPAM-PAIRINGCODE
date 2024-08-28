@@ -4,7 +4,8 @@
       { "src": "api/spam.js", "use": "@vercel/node" }
     ],
     "routes": [
-      { "src": "/api/spam", "dest": "/api/spam.js" }
+      { "src": "/api/spam", "dest": "/api/spam.js" },
+      { "src": "/(.*)", "dest": "/public/$1" }
     ]
   }
   
