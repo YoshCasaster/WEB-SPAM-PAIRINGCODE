@@ -1,6 +1,6 @@
-const pino = require('pino');
-const NodeCache = require('node-cache');
 const { default: makeWASocket, fetchLatestBaileysVersion, useMultiFileAuthState, makeInMemoryStore, Browsers } = require('@whiskeysockets/baileys');
+const NodeCache = require('node-cache');
+const pino = require('pino');
 
 const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
 const progressCache = new NodeCache();
