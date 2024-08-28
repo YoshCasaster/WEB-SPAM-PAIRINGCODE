@@ -1,11 +1,19 @@
 {
     "version": 2,
     "builds": [
-      { "src": "api/spam.js", "use": "@vercel/node" }
+      {
+        "src": "api/spam.js",
+        "use": "@vercel/node"
+      },
+      {
+        "src": "api/control.js",
+        "use": "@vercel/node"
+      }
     ],
     "routes": [
       { "src": "/api/spam", "dest": "/api/spam.js" },
-      { "src": "/(.*)", "dest": "/public/$1" }
+      { "src": "/api/control", "dest": "/api/control.js" },
+      { "src": "/", "dest": "/public/index.html" }
     ]
   }
   

@@ -3,22 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPAM PAIRING CODE by YOSHCASASTER</title>
-    <link rel="stylesheet" href="/style.css">
+    <title>Spam Pairing Code</title>
 </head>
 <body>
-    <header>
-        <h1>SPAM PAIRING CODE by YOSHCASASTER</h1>
-    </header>
-    <main>
-        <form id="spam-form">
-            <label for="phoneNumber">Masukkan Nomor HP (format 62*****):</label>
-            <input type="text" id="phoneNumber" name="phoneNumber" required>
-            <button type="submit">Kirim</button>
-            <button type="button" id="stopButton">Stop</button>
-        </form>
-        <div id="progress">Progress pengiriman akan ditampilkan di sini.</div>
-    </main>
-    <script src="/script.js"></script>
+    <h1>Spam Pairing Code</h1>
+    <form id="spamForm">
+        <label for="phoneNumber">Nomor WhatsApp:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required placeholder="+6281234567890">
+        <button type="button" onclick="startSpam()">Mulai</button>
+        <button type="button" onclick="stopSpam()">Berhenti</button>
+    </form>
+
+    <script>
+        async function startSpam() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const response = await fetch('/api/spam', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: 'start', phoneNumber })
+            });
+            const result = await response.json();
+            alert(result.message);
+        }
+
+        async function stopSpam() {
+            const response = await fetch('/api/control', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: 'stop' })
+            });
+            const result = await response.json();
+            alert(result.message);
+        }
+    </script>
 </body>
 </html>
