@@ -4,8 +4,11 @@
   "description": "Web application for generating WhatsApp pairing codes.",
   "main": "spam.js",
   "scripts": {
-    "start": "node spam.js"
-  },
+  "start": "node spam.js",
+  "vercel-build": "echo 'No build step required'",
+  "build": "echo 'No build step required'"
+},
+
   "dependencies": {
     "express": "^4.18.2",
     "@whiskeysockets/baileys": "^6.4.0",
