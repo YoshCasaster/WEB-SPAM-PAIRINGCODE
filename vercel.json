@@ -1,0 +1,15 @@
+{
+    "builds": [
+      {
+        "src": "spam.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/spam.js"
+      }
+    ]
+  }
+  

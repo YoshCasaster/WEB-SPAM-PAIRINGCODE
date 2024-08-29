@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spam Pairing Code</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .start-button {
+      background-color: #28a745;
+    }
+    .stop-button {
+      background-color: #dc3545;
+    }
+    .status {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Spam Pairing Code YOSEPWDD</h1>
+    <input type="text" id="phoneNumber" placeholder="Masukkan nomor WhatsApp" />
+    <button id="startButton" class="start-button">Mulai</button>
+    <button id="stopButton" class="stop-button">Stop</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
