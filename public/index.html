@@ -1,60 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spam Pairing Code</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #f4f4f4;
-      margin: 0;
-    }
-    .container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      color: #fff;
-      cursor: pointer;
-      margin-right: 10px;
-    }
-    .start-button {
-      background-color: #28a745;
-    }
-    .stop-button {
-      background-color: #dc3545;
-    }
-    .status {
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Pairing Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #progress {
+            width: 100%;
+            height: 30px;
+            background-color: #f3f3f3;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #4caf50;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+        .button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Spam Pairing Code YOSEPWDD</h1>
-    <input type="text" id="phoneNumber" placeholder="Masukkan nomor WhatsApp" />
-    <button id="startButton" class="start-button">Mulai</button>
-    <button id="stopButton" class="stop-button">Stop</button>
-    <div class="status" id="status"></div>
-  </div>
+    <h1>Spam Pairing Code</h1>
+    <input type="text" id="phone-number" placeholder="Enter phone number" />
+    <button id="start-btn" class="button">Mulai</button>
+    <button id="stop-btn" class="button" disabled>Stop</button>
 
-  <script src="script.js"></script>
+    <div id="progress">
+        <div id="progress-bar">0%</div>
+    </div>
+    <p id="status"></p>
+
+    <script>
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const statusText = document.getElementById('status');
+
+        startBtn.addEventListener('click', () => {
+            const phoneNumber = document.getElementById('phone-number').value;
+            if (phoneNumber) {
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+
+                fetch('/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber })
+                }).catch(err => console.error(err));
+            } else {
+                alert('Nomor telepon tidak boleh kosong!');
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            fetch('/stop', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    statusText.textContent = data.message;
+                    stopBtn.disabled = true;
+                    startBtn.disabled = false;
+                    progressBar.style.width = '0%';
+                    progressBar.textContent = '0%';
+                });
+        });
+
+        const socket = io();
+        socket.on('progress', ({ second, code }) => {
+            const progress = (5 - second) * 20;
+            progressBar.style.width = `${progress}%`;
+            progressBar.textContent = `${progress}%`;
+            statusText.textContent = `Spam Berjalan Selama: ${second} detik... Pairing Code: ${code}`;
+        });
+    </script>
 </body>
 </html>
