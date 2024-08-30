@@ -25,7 +25,7 @@ const NodeCache = require('node-cache');
 const Pino = require('pino');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3001; // Gunakan port dari environment variabel jika tersedia
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
