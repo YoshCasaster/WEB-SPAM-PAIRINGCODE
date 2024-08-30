@@ -16,7 +16,6 @@
   },
   "scripts": {
     "build": "npm run vercel-build && node server.js",
-    "vercel-build": "your-vercel-build-command",
     "start": "node server.js"
   },
   "keywords": [],
