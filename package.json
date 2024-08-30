@@ -15,7 +15,8 @@
     "pino": "^9.3.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run vercel-build && node server.js",
+    "vercel-build": "your-vercel-build-command",
     "start": "node server.js"
   },
   "keywords": [],
