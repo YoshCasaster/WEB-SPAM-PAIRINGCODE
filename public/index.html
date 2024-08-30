@@ -1,96 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spam Pairing Code</title>
+    <title>Masukkan Nomor WhatsApp</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: url('/media/bg1.jpg') no-repeat center center fixed;
+            background-size: cover;
+            transition: background 1s ease-in-out;
         }
-        #progress {
-            width: 100%;
-            height: 30px;
-            background-color: #f3f3f3;
+        #phoneNumberForm, #passwordForm {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"] {
+            padding: 10px;
             border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+            margin: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button.stop {
+            background-color: #dc3545;
+        }
+        #responseMessage, #stopNotification, #passwordNotification {
             margin-top: 20px;
         }
-        #progress-bar {
-            width: 0%;
-            height: 100%;
-            background-color: #4caf50;
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
             text-align: center;
-            line-height: 30px;
-            color: white;
+            padding: 15px;
+            background: linear-gradient(135deg, #333, #555);
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
         }
-        .button {
-            padding: 10px 20px;
-            margin: 5px;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            cursor: pointer;
+        #footer a {
+            color: #fff;
+            text-decoration: none;
+            font-style: italic;
         }
-        .button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
+        #footer a:hover {
+            text-decoration: underline;
+        }
+        #footer .footer-logo {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 20px;
         }
     </style>
 </head>
-<body>
-    <h1>Spam Pairing Code</h1>
-    <input type="text" id="phone-number" placeholder="Enter phone number" />
-    <button id="start-btn" class="button">Mulai</button>
-    <button id="stop-btn" class="button" disabled>Stop</button>
-
-    <div id="progress">
-        <div id="progress-bar">0%</div>
+<body id="background">
+    <div id="passwordForm">
+        <h1>Masukkan Password</h1>
+        <input type="password" id="password" placeholder="Masukkan password" required>
+        <button id="submitPassword">Submit</button>
+        <p id="passwordNotification"></p>
     </div>
-    <p id="status"></p>
+    <div id="phoneNumberForm" style="display: none;">
+        <h1>Masukkan Nomor WhatsApp</h1>
+        <form id="form">
+            <label for="phoneNumber">Nomor WhatsApp:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="6281234567890" required>
+            <button type="submit">Kirim</button>
+            <button type="button" class="stop" id="stopButton">Stop</button>
+        </form>
+        <p id="responseMessage"></p>
+        <p id="stopNotification"></p>
+    </div>
+    <div id="footer">
+        <span class="footer-logo">YosepWD</span>
+        <div>Created By <a href="https://www.yosepwd.com" target="_blank">YosepWD</a></div>
+    </div>
 
-    <script>
-        const startBtn = document.getElementById('start-btn');
-        const stopBtn = document.getElementById('stop-btn');
-        const progressBar = document.getElementById('progress-bar');
-        const statusText = document.getElementById('status');
-
-        startBtn.addEventListener('click', () => {
-            const phoneNumber = document.getElementById('phone-number').value;
-            if (phoneNumber) {
-                startBtn.disabled = true;
-                stopBtn.disabled = false;
-
-                fetch('/start', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phoneNumber })
-                }).catch(err => console.error(err));
-            } else {
-                alert('Nomor telepon tidak boleh kosong!');
-            }
-        });
-
-        stopBtn.addEventListener('click', () => {
-            fetch('/stop', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    statusText.textContent = data.message;
-                    stopBtn.disabled = true;
-                    startBtn.disabled = false;
-                    progressBar.style.width = '0%';
-                    progressBar.textContent = '0%';
-                });
-        });
-
-        const socket = io();
-        socket.on('progress', ({ second, code }) => {
-            const progress = (5 - second) * 20;
-            progressBar.style.width = `${progress}%`;
-            progressBar.textContent = `${progress}%`;
-            statusText.textContent = `Spam Berjalan Selama: ${second} detik... Pairing Code: ${code}`;
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
